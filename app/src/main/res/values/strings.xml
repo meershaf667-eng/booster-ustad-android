@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Booster Ustad</string>
+    <!-- Public URL of the Booster Ustad web app (Render). Updated after deploy. -->
+    <string name="booster_url">https://booster-ustad.onrender.com</string>
+</resources>

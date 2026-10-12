@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tab_booster"
+        android:icon="@drawable/ic_booster"
+        android:title="Ustad" />
+    <item
+        android:id="@+id/tab_facebook"
+        android:icon="@drawable/ic_facebook"
+        android:title="Facebook" />
+    <item
+        android:id="@+id/tab_google"
+        android:icon="@drawable/ic_google"
+        android:title="Google" />
+    <item
+        android:id="@+id/tab_gmail"
+        android:icon="@drawable/ic_gmail"
+        android:title="Gmail" />
+    <item
+        android:id="@+id/tab_playstore"
+        android:icon="@drawable/ic_playstore"
+        android:title="Store" />
+</menu>
