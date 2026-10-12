@@ -39,7 +39,11 @@ class MainActivity : AppCompatActivity() {
         val cookieManager = CookieManager.getInstance()
         cookieManager.setAcceptCookie(true)
 
-        val boosterUrl = getString(R.string.booster_url)
+        // Booster URL: user can change it in Settings (saved on phone).
+        // Default = Render URL; for home WiFi use http://<laptop-ip>:3000
+        val prefs = getSharedPreferences("booster_ustad", MODE_PRIVATE)
+        val boosterUrl = prefs.getString("booster_url", getString(R.string.booster_url))
+            ?: getString(R.string.booster_url)
         val tabs = mapOf(
             R.id.tab_booster to Pair(findViewById<WebView>(R.id.web_booster), boosterUrl),
             R.id.tab_facebook to Pair(findViewById<WebView>(R.id.web_facebook), "https://m.facebook.com"),
@@ -57,6 +61,10 @@ class MainActivity : AppCompatActivity() {
 
         val nav = findViewById<BottomNavigationView>(R.id.bottom_nav)
         nav.setOnItemSelectedListener { item ->
+            if (item.itemId == R.id.tab_settings) {
+                showUrlSettings()
+                return@setOnItemSelectedListener false
+            }
             showTab(item.itemId)
             true
         }
@@ -130,6 +138,38 @@ class MainActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         webViews.values.forEach { it.onPause() }
+    }
+
+    /** Settings dialog: change the Booster Ustad server URL (e.g. home WiFi laptop IP). */
+    private fun showUrlSettings() {
+        val prefs = getSharedPreferences("booster_ustad", MODE_PRIVATE)
+        val current = prefs.getString("booster_url", getString(R.string.booster_url))
+        val input = android.widget.EditText(this).apply {
+            setText(current)
+            hint = "http://192.168.1.10:3000"
+            inputType = android.text.InputType.TYPE_TEXT_VARIATION_URI
+        }
+        val padding = (16 * resources.displayMetrics.density).toInt()
+        val container = android.widget.FrameLayout(this).apply {
+            setPadding(padding, padding / 2, padding, 0)
+            addView(input)
+        }
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Booster Ustad URL")
+            .setMessage("Apne laptop ka address likhein.\nGhar WiFi: http://192.168.1.X:3000\n(Jahan X aapke laptop ka number hai)")
+            .setView(container)
+            .setPositiveButton("Save") { _, _ ->
+                var url = input.text.toString().trim().trimEnd('/')
+                if (url.isNotEmpty()) {
+                    if (!url.startsWith("http")) url = "http://$url"
+                    prefs.edit().putString("booster_url", url).apply()
+                    webViews[R.id.tab_booster]?.loadUrl(url)
+                    showTab(R.id.tab_booster)
+                    findViewById<BottomNavigationView>(R.id.bottom_nav).selectedItemId = R.id.tab_booster
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     override fun onResume() {
